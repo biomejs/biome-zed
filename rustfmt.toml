@@ -1,3 +1,4 @@
+newline_style = "Unix"
 tab_spaces = 2
 hard_tabs = false
 max_width = 100

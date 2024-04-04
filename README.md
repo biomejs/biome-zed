@@ -1,12 +1,12 @@
 # Biome - Zed
 
-This extension adds support for [Biome](https://github.com/biomejs/biome) in Zed.
+This extension adds support for [Biome](https://github.com/biomejs/biome) in [Zed](https://zed.dev/).
 
 ## Configure Formatting
 
 Example formatter configurations in zed `settings.json`.
 
-```json
+```jsonc
 // settings.json
 {
   // Format on save
