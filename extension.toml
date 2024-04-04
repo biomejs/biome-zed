@@ -8,11 +8,16 @@ repository = "https://github.com/biomejs/biome-zed"
 
 [language_servers.biome]
 name = "Biome Language Server"
-language = "TypeScript"
-language_ids = { "TypeScript" = "typescript", "JavaScript" = "javascript", "TSX" = "typescriptreact" }
+language = "JavaScript"
+language_ids = { "JavaScript" = "javascript" }
 
-# cant register for multiple langs yet
+# cant register a single one for multiple langs yet
+[language_servers.biome_ts]
+name = "Biome Language Server"
+language = "TypeScript"
+language_ids = { "TypeScript" = "typescript" }
+
 [language_servers.biome_tsx]
 name = "Biome Language Server"
 language = "TSX"
-language_ids = { "TypeScript" = "typescript", "JavaScript" = "javascript", "TSX" = "typescriptreact" }
+language_ids = { "TSX" = "typescriptreact" }
