@@ -2,41 +2,21 @@
 
 This extension adds support for [Biome](https://github.com/biomejs/biome) in Zed.
 
-## Formatting
+## Configure Formatting
 
-Formatter configurations in zed `settings.json`.
-
-### Format on save
+Example formatter configurations in zed `settings.json`.
 
 ```json
 // settings.json
 {
+  // Format on save
   "format_on_save": "on",
-}
-```
 
-### Code Actions
-
-Run fixAll on format.
-
-```json
-// settings.json
-{
   "formatter": {
     "code_actions": {
+      // Run fixAll on format.
       "source.fixAll": true,
-    }
-  }
-}
-```
-
-### Organize Imports
-
-```json
-// settings.json
-{
-  "formatter": {
-    "code_actions": {
+      // Organize Imports
       "source.organizeImports": true
     }
   }
