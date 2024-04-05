@@ -3,7 +3,7 @@ name = "Biome"
 description = "Biome support for Zed"
 version = "0.0.1"
 schema_version = 1
-authors = []
+authors = ["biomejs <biomejs.dev>"]
 repository = "https://github.com/biomejs/biome-zed"
 
 [language_servers.biome]
