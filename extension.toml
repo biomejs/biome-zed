@@ -8,5 +8,21 @@ repository = "https://github.com/biomejs/biome-zed"
 
 [language_servers.biome]
 name = "Biome Language Server"
-languages = ["JavaScript", "JSX", "TypeScript", "TSX", "JSON"]
-language_ids = { "JavaScript" = "javascript", "JSX" = "javascriptreact", "TypeScript" = "typescript", "TSX" = "typescriptreact", "JSON" = "json" }
+languages = [
+    "JavaScript",
+    "JSX",
+    "TypeScript",
+    "TSX",
+    "Vue.js",
+    "Astro",
+    "Svelte",
+]
+
+[language_ids]
+"JavaScript" = "javascript"
+"JSX" = "javascriptreact"
+"TypeScript" = "typescript"
+"TSX" = "typescriptreact"
+"Vue.js" = "vuejs"
+"Astro" = "astro"
+"Svelte" = "svelte"
