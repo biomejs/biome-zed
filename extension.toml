@@ -8,6 +8,7 @@ repository = "https://github.com/biomejs/biome-zed"
 
 [language_servers.biome]
 name = "Biome Language Server"
+language = "JavaScript"
 languages = [
     "JavaScript",
     "JSX",

@@ -13,7 +13,7 @@ impl BiomeExtension {
     fs::metadata(SERVER_PATH).map_or(false, |stat| stat.is_file())
   }
 
-  fn server_script_path(&mut self, ls_id: &zed::LanguageServerId) -> Result<String> {
+  fn server_script_path(&mut self, ls_id: &String) -> Result<String> {
     let server_exists = self.server_exists();
     if self.did_find_server && server_exists {
       return Ok(SERVER_PATH.to_string());
@@ -63,10 +63,10 @@ impl zed::Extension for BiomeExtension {
 
   fn language_server_command(
     &mut self,
-    language_server_id: &zed::LanguageServerId,
+    config: zed::LanguageServerConfig,
     _worktree: &zed::Worktree,
   ) -> Result<zed::Command> {
-    let path = self.server_script_path(&language_server_id)?;
+    let path = self.server_script_path(&config.name)?;
 
     Ok(zed::Command {
       command: zed::node_binary_path()?,
