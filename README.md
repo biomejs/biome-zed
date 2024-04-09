@@ -6,7 +6,7 @@ Currently supports **JavaScript**, **TypeScript**, **TSX**, **Vue.js**, **Astro*
 
 ## Installtion
 
-Requires Zed >= **v0.131.0**.
+Requires Zed >= **v0.130.0**.
 
 This extension is available in the extensions view inside the Zed editor. Open `zed: extensions` and search for _Biome_.
 
