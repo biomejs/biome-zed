@@ -18,7 +18,7 @@ languages = [
     "Svelte",
 ]
 
-[language_ids]
+[language_servers.biome.language_ids]
 "JavaScript" = "javascript"
 "JSX" = "javascriptreact"
 "TypeScript" = "typescript"
