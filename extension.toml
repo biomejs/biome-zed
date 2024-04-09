@@ -1,23 +1,28 @@
 id = "biome"
 name = "Biome"
 description = "Biome support for Zed"
-version = "0.0.1"
+version = "0.0.2"
 schema_version = 1
 authors = ["biomejs <biomejs.dev>"]
 repository = "https://github.com/biomejs/biome-zed"
 
 [language_servers.biome]
 name = "Biome Language Server"
-language = "JavaScript"
-language_ids = { "JavaScript" = "javascript" }
+languages = [
+    "JavaScript",
+    "JSX",
+    "TypeScript",
+    "TSX",
+    "Vue.js",
+    "Astro",
+    "Svelte",
+]
 
-# cant register a single one for multiple langs yet
-[language_servers.biome_ts]
-name = "Biome Language Server"
-language = "TypeScript"
-language_ids = { "TypeScript" = "typescript" }
-
-[language_servers.biome_tsx]
-name = "Biome Language Server"
-language = "TSX"
-language_ids = { "TSX" = "typescriptreact" }
+[language_ids]
+"JavaScript" = "javascript"
+"JSX" = "javascriptreact"
+"TypeScript" = "typescript"
+"TSX" = "typescriptreact"
+"Vue.js" = "vuejs"
+"Astro" = "astro"
+"Svelte" = "svelte"
