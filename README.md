@@ -26,7 +26,7 @@ Example configurations in zed `settings.json`.
   "format_on_save": "on",
   "code_actions_on_format": {
     "source.fixAll": true,
-    "source.organizeImports": true
+    "source.organizeImports.biome": true
   },
   "formatter": {
     "external": {
