@@ -28,16 +28,6 @@ Example configurations in zed `settings.json`.
     "source.fixAll": true,
     "source.organizeImports.biome": true
   },
-  "formatter": {
-    "external": {
-      "command": "./node_modules/@biomejs/biome/bin/biome",
-      "arguments": [
-        "format",
-        "--write",
-        "--stdin-file-path",
-        "{buffer_path}"
-      ]
-    }
-  }
+  "formatter": "language_server"
 }
 ```
