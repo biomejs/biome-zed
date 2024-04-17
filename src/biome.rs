@@ -1,31 +1,48 @@
-use std::{env, fs};
+use std::{env, fs, path::Path};
+use zed::LanguageServerId;
 use zed_extension_api::{self as zed, Result};
 
-const SERVER_PATH: &str = "node_modules/.bin/biome";
+const SERVER_PATH: &str = "node_modules/@biomejs/biome/bin/biome";
 const PACKAGE_NAME: &str = "@biomejs/biome";
 
 struct BiomeExtension {
-  did_find_server: bool,
+  cached_server_path: Option<String>,
 }
 
 impl BiomeExtension {
-  fn server_exists(&self) -> bool {
-    fs::metadata(SERVER_PATH).map_or(false, |stat| stat.is_file())
+  fn server_exists(&self, path: &str) -> bool {
+    fs::metadata(path).map_or(false, |stat| stat.is_file())
   }
 
-  fn server_script_path(&mut self, ls_id: &String) -> Result<String> {
-    let server_exists = self.server_exists();
-    if self.did_find_server && server_exists {
-      return Ok(SERVER_PATH.to_string());
+  fn server_script_path(
+    &mut self,
+    ls_id: &LanguageServerId,
+    worktree: &zed::Worktree,
+  ) -> Result<String> {
+    if let Some(path) = &self.cached_server_path {
+      return Ok(path.clone());
+    }
+
+    let local_server_path = Path::new(worktree.root_path().as_str())
+      .join(SERVER_PATH)
+      .to_string_lossy()
+      .to_string();
+    let local_server_exists = self.server_exists(local_server_path.as_str());
+    if !local_server_exists {
+      self.cached_server_path = Some(local_server_path.clone());
+      return Ok(local_server_path);
     }
 
     zed::set_language_server_installation_status(
       ls_id,
       &zed::LanguageServerInstallationStatus::CheckingForUpdate,
     );
+
+    let fallback_server_path = SERVER_PATH.to_string();
+    let fallback_server_exist = self.server_exists(fallback_server_path.as_str());
     let version = zed::npm_package_latest_version(PACKAGE_NAME)?;
 
-    if !server_exists
+    if !fallback_server_exist
       || zed::npm_package_installed_version(PACKAGE_NAME)?.as_ref() != Some(&version)
     {
       zed::set_language_server_installation_status(
@@ -35,38 +52,38 @@ impl BiomeExtension {
       let result = zed::npm_install_package(PACKAGE_NAME, &version);
       match result {
         Ok(()) => {
-          if !self.server_exists() {
+          if !self.server_exists(fallback_server_path.as_str()) {
             Err(format!(
-              "installed package '{PACKAGE_NAME}' did not contain expected path '{SERVER_PATH}'",
+              "installed package '{PACKAGE_NAME}' did not contain expected path '{fallback_server_path}'",
             ))?;
           }
         }
         Err(error) => {
-          if !self.server_exists() {
+          if !self.server_exists(fallback_server_path.as_str()) {
             Err(error)?;
           }
         }
       }
     }
 
-    self.did_find_server = true;
-    Ok(SERVER_PATH.to_string())
+    self.cached_server_path = Some(fallback_server_path.clone());
+    Ok(fallback_server_path.to_string())
   }
 }
 
 impl zed::Extension for BiomeExtension {
   fn new() -> Self {
     Self {
-      did_find_server: false,
+      cached_server_path: None,
     }
   }
 
   fn language_server_command(
     &mut self,
-    config: zed::LanguageServerConfig,
-    _worktree: &zed::Worktree,
+    language_server_id: &zed::LanguageServerId,
+    worktree: &zed::Worktree,
   ) -> Result<zed::Command> {
-    let path = self.server_script_path(&config.name)?;
+    let path = self.server_script_path(language_server_id, worktree)?;
 
     Ok(zed::Command {
       command: zed::node_binary_path()?,
