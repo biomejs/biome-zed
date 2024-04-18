@@ -1,24 +1,24 @@
-authors = ["biomejs <biomejs.dev>"]
-description = "Biome support for Zed"
-id = "biome"
-name = "Biome"
-repository = "https://github.com/biomejs/biome-zed"
+authors        = ["biomejs <biomejs.dev>"]
+description    = "Biome support for Zed"
+id             = "biome"
+name           = "Biome"
+repository     = "https://github.com/biomejs/biome-zed"
 schema_version = 1
-version = "0.0.4"
+version        = "0.0.4"
 
 [language_servers.biome]
 code_actions_kind = ["", "quickfix"]
-language = "JavaScript"
-languages = ["JavaScript", "JSX", "TypeScript", "TSX", "Vue.js", "Astro", "Svelte", "JSON", "JSONC"]
-name = "Biome Language Server"
+language          = "JavaScript"
+languages         = ["JavaScript", "JSX", "TypeScript", "TSX", "Vue.js", "Astro", "Svelte", "JSON", "JSONC"]
+name              = "Biome Language Server"
 
 [language_servers.biome.language_ids]
-"Astro" = "astro"
-"JSON" = "json"
-"JSONC" = "jsonc"
-"JSX" = "javascriptreact"
+"Astro"      = "astro"
+"JSON"       = "json"
+"JSONC"      = "jsonc"
+"JSX"        = "javascriptreact"
 "JavaScript" = "javascript"
-"Svelte" = "svelte"
-"TSX" = "typescriptreact"
+"Svelte"     = "svelte"
+"TSX"        = "typescriptreact"
 "TypeScript" = "typescript"
-"Vue.js" = "vuejs"
+"Vue.js"     = "vuejs"
