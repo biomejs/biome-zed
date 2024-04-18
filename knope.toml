@@ -1,0 +1,3 @@
+[package]
+changelog = "CHANGELOG.md"
+versioned_files = ["Cargo.toml"]
