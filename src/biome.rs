@@ -19,11 +19,15 @@ impl BiomeExtension {
     ls_id: &LanguageServerId,
     worktree: &zed::Worktree,
   ) -> Result<String> {
+    let worktree_root_path = &worktree.root_path();
+
     if let Some(path) = &self.cached_server_path {
-      return Ok(path.clone());
+      if path.starts_with(worktree_root_path.as_str()) {
+        return Ok(path.clone());
+      }
     }
 
-    let local_server_path = Path::new(worktree.root_path().as_str())
+    let local_server_path = Path::new(worktree_root_path.as_str())
       .join(SERVER_PATH)
       .to_string_lossy()
       .to_string();
