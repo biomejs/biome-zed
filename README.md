@@ -10,12 +10,6 @@ Requires Zed >= **v0.131.0**.
 
 This extension is available in the extensions view inside the Zed editor. Open `zed: extensions` and search for _Biome_.
 
-### Development
-
-1. Clone this repository.
-2. Run the `zed: install dev extensions` command.
-3. Select the directory of this repo.
-
 ## Configuration
 
 Example configurations in zed `settings.json`.

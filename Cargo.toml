@@ -1,13 +1,16 @@
 [package]
-name = "zed_biome"
-version = "0.0.1"
 edition = "2021"
-publish = false
 license = "MIT"
+name    = "zed_biome"
+publish = false
+version = "0.0.3"
 
 [lib]
-path = "src/biome.rs"
 crate-type = ["cdylib"]
+path       = "src/biome.rs"
 
 [dependencies]
-zed_extension_api = "0.0.5"
+log                = "0.4.21"
+tracing            = "0.1.40"
+tracing-subscriber = "0.3.18"
+zed_extension_api  = "0.0.6"
