@@ -5,9 +5,7 @@ use zed_extension_api::{self as zed, Result};
 const SERVER_PATH: &str = "node_modules/@biomejs/biome/bin/biome";
 const PACKAGE_NAME: &str = "@biomejs/biome";
 
-struct BiomeExtension {
-  cached_server_path: Option<String>,
-}
+struct BiomeExtension {}
 
 impl BiomeExtension {
   fn server_exists(&self, path: &str) -> bool {
@@ -21,20 +19,13 @@ impl BiomeExtension {
   ) -> Result<String> {
     let worktree_root_path = &worktree.root_path();
 
-    if let Some(path) = &self.cached_server_path {
-      if path.starts_with(worktree_root_path.as_str()) {
-        return Ok(path.clone());
-      }
-    }
-
-    let local_server_path = Path::new(worktree_root_path.as_str())
+    let worktree_server_path = Path::new(worktree_root_path.as_str())
       .join(SERVER_PATH)
       .to_string_lossy()
       .to_string();
-    let local_server_exists = self.server_exists(local_server_path.as_str());
-    if !local_server_exists {
-      self.cached_server_path = Some(local_server_path.clone());
-      return Ok(local_server_path);
+    let worktree_server_exists = self.server_exists(worktree_server_path.as_str());
+    if !worktree_server_exists {
+      return Ok(worktree_server_path);
     }
 
     zed::set_language_server_installation_status(
@@ -70,16 +61,13 @@ impl BiomeExtension {
       }
     }
 
-    self.cached_server_path = Some(fallback_server_path.clone());
     Ok(fallback_server_path.to_string())
   }
 }
 
 impl zed::Extension for BiomeExtension {
   fn new() -> Self {
-    Self {
-      cached_server_path: None,
-    }
+    Self {}
   }
 
   fn language_server_command(
