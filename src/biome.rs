@@ -18,13 +18,12 @@ impl BiomeExtension {
     worktree: &zed::Worktree,
   ) -> Result<String> {
     let worktree_root_path = &worktree.root_path();
-
     let worktree_server_path = Path::new(worktree_root_path.as_str())
       .join(SERVER_PATH)
       .to_string_lossy()
       .to_string();
     let worktree_server_exists = self.server_exists(worktree_server_path.as_str());
-    if !worktree_server_exists {
+    if worktree_server_exists {
       return Ok(worktree_server_path);
     }
 
