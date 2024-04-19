@@ -16,18 +16,18 @@ impl BiomeExtension {
     language_server_id: &LanguageServerId,
     worktree: &zed::Worktree,
   ) -> Result<String> {
-    let worktree_root_path = worktree.root_path();
-    let worktree_server_path = Path::new(worktree_root_path.as_str())
-      .join(SERVER_PATH)
-      .to_string_lossy()
-      .to_string();
-
     // This is a workaround, as reading the file from wasm doesn't work.
     // Instead we try to read the `@biomejs/biome`, see if the package exists
     let worktree_server_exists = worktree
       .read_text_file("node_modules/@biomejs/biome/package.json")
       .map_or(false, |_f| true);
     if worktree_server_exists {
+      let worktree_root_path = worktree.root_path();
+      let worktree_server_path = Path::new(worktree_root_path.as_str())
+        .join(SERVER_PATH)
+        .to_string_lossy()
+        .to_string();
+
       return Ok(worktree_server_path);
     }
 
