@@ -4,7 +4,7 @@ use zed_extension_api::{self as zed, LanguageServerId, Result};
 const SERVER_PATH: &str = "node_modules/@biomejs/biome/bin/biome";
 const PACKAGE_NAME: &str = "@biomejs/biome";
 
-struct BiomeExtension {}
+struct BiomeExtension;
 
 impl BiomeExtension {
   fn server_exists(&self, path: &str) -> bool {
@@ -70,7 +70,7 @@ impl BiomeExtension {
 
 impl zed::Extension for BiomeExtension {
   fn new() -> Self {
-    Self {}
+    Self
   }
 
   fn language_server_command(
