@@ -1,5 +1,4 @@
 use std::{env, fs, path::Path};
-use zed::LanguageServerId;
 use zed_extension_api::{self as zed, LanguageServerId, Result};
 
 const SERVER_PATH: &str = "node_modules/@biomejs/biome/bin/biome";
@@ -14,7 +13,7 @@ impl BiomeExtension {
 
   fn server_script_path(
     &mut self,
-    ls_id: &LanguageServerId,
+    language_server_id: &LanguageServerId,
     worktree: &zed::Worktree,
   ) -> Result<String> {
     let worktree_root_path = worktree.root_path();
