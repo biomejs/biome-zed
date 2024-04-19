@@ -1,5 +1,5 @@
 use std::{env, fs, path::Path};
-use zed_extension_api::{self as zed, LanguageServerId, Result};
+use zed_extension_api::{self as zed, serde_json, LanguageServerId, Result};
 
 const SERVER_PATH: &str = "node_modules/@biomejs/biome/bin/biome";
 const PACKAGE_NAME: &str = "@biomejs/biome";
@@ -17,11 +17,18 @@ impl BiomeExtension {
     worktree: &zed::Worktree,
   ) -> Result<String> {
     // This is a workaround, as reading the file from wasm doesn't work.
-    // Instead we try to read the `@biomejs/biome`, see if the package exists
-    let worktree_server_exists = worktree
-      .read_text_file("node_modules/@biomejs/biome/package.json")
-      .map_or(false, |_f| true);
-    if worktree_server_exists {
+    // Instead we try to read the `package.json`, see if `@biomejs/biome` is installed
+    let package_json = worktree
+      .read_text_file("package.json")
+      .unwrap_or(String::from(r#"{}"#));
+    let package_json: Option<serde_json::Value> = serde_json::from_str(package_json.as_str()).ok();
+
+    let server_package_exists = package_json.is_some_and(|f| {
+      !f["dependencies"]["@biomejs/biome"].is_null()
+        || !f["devDependencies"]["@biomejs/biome"].is_null()
+    });
+
+    if server_package_exists {
       let worktree_root_path = worktree.root_path();
       let worktree_server_path = Path::new(worktree_root_path.as_str())
         .join(SERVER_PATH)
