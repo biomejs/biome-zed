@@ -1,6 +1,6 @@
 use std::{env, fs, path::Path};
 use zed::LanguageServerId;
-use zed_extension_api::{self as zed, Result};
+use zed_extension_api::{self as zed, LanguageServerId, Result};
 
 const SERVER_PATH: &str = "node_modules/@biomejs/biome/bin/biome";
 const PACKAGE_NAME: &str = "@biomejs/biome";
@@ -33,7 +33,7 @@ impl BiomeExtension {
     }
 
     zed::set_language_server_installation_status(
-      ls_id,
+      language_server_id,
       &zed::LanguageServerInstallationStatus::CheckingForUpdate,
     );
 
@@ -45,7 +45,7 @@ impl BiomeExtension {
       || zed::npm_package_installed_version(PACKAGE_NAME)?.as_ref() != Some(&version)
     {
       zed::set_language_server_installation_status(
-        &ls_id,
+        language_server_id,
         &zed::LanguageServerInstallationStatus::Downloading,
       );
       let result = zed::npm_install_package(PACKAGE_NAME, &version);
@@ -76,7 +76,7 @@ impl zed::Extension for BiomeExtension {
 
   fn language_server_command(
     &mut self,
-    language_server_id: &zed::LanguageServerId,
+    language_server_id: &LanguageServerId,
     worktree: &zed::Worktree,
   ) -> Result<zed::Command> {
     let path = self.server_script_path(language_server_id, worktree)?;
@@ -86,7 +86,7 @@ impl zed::Extension for BiomeExtension {
       args: vec![
         env::current_dir()
           .unwrap()
-          .join(&path)
+          .join(path)
           .to_string_lossy()
           .to_string(),
         "lsp-proxy".to_string(),
