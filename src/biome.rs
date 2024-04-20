@@ -1,31 +1,53 @@
-use std::{env, fs};
-use zed_extension_api::{self as zed, LanguageServerId, Result};
+use std::{env, fs, path::Path};
+use zed_extension_api::{self as zed, serde_json, LanguageServerId, Result};
 
-const SERVER_PATH: &str = "node_modules/.bin/biome";
+const SERVER_PATH: &str = "node_modules/@biomejs/biome/bin/biome";
 const PACKAGE_NAME: &str = "@biomejs/biome";
 
-struct BiomeExtension {
-  did_find_server: bool,
-}
+struct BiomeExtension;
 
 impl BiomeExtension {
-  fn server_exists(&self) -> bool {
-    fs::metadata(SERVER_PATH).map_or(false, |stat| stat.is_file())
+  fn server_exists(&self, path: &str) -> bool {
+    fs::metadata(path).map_or(false, |stat| stat.is_file())
   }
 
-  fn server_script_path(&mut self, language_server_id: &LanguageServerId) -> Result<String> {
-    let server_exists = self.server_exists();
-    if self.did_find_server && server_exists {
-      return Ok(SERVER_PATH.to_string());
+  fn server_script_path(
+    &mut self,
+    language_server_id: &LanguageServerId,
+    worktree: &zed::Worktree,
+  ) -> Result<String> {
+    // This is a workaround, as reading the file from wasm doesn't work.
+    // Instead we try to read the `package.json`, see if `@biomejs/biome` is installed
+    let package_json = worktree
+      .read_text_file("package.json")
+      .unwrap_or(String::from(r#"{}"#));
+    let package_json: Option<serde_json::Value> = serde_json::from_str(package_json.as_str()).ok();
+
+    let server_package_exists = package_json.is_some_and(|f| {
+      !f["dependencies"]["@biomejs/biome"].is_null()
+        || !f["devDependencies"]["@biomejs/biome"].is_null()
+    });
+
+    if server_package_exists {
+      let worktree_root_path = worktree.root_path();
+      let worktree_server_path = Path::new(worktree_root_path.as_str())
+        .join(SERVER_PATH)
+        .to_string_lossy()
+        .to_string();
+
+      return Ok(worktree_server_path);
     }
 
     zed::set_language_server_installation_status(
       language_server_id,
       &zed::LanguageServerInstallationStatus::CheckingForUpdate,
     );
+
+    let fallback_server_path = SERVER_PATH.to_string();
+    let fallback_server_exist = self.server_exists(fallback_server_path.as_str());
     let version = zed::npm_package_latest_version(PACKAGE_NAME)?;
 
-    if !server_exists
+    if !fallback_server_exist
       || zed::npm_package_installed_version(PACKAGE_NAME)?.as_ref() != Some(&version)
     {
       zed::set_language_server_installation_status(
@@ -35,38 +57,35 @@ impl BiomeExtension {
       let result = zed::npm_install_package(PACKAGE_NAME, &version);
       match result {
         Ok(()) => {
-          if !self.server_exists() {
+          if !self.server_exists(fallback_server_path.as_str()) {
             Err(format!(
-              "installed package '{PACKAGE_NAME}' did not contain expected path '{SERVER_PATH}'",
+              "installed package '{PACKAGE_NAME}' did not contain expected path '{fallback_server_path}'",
             ))?;
           }
         }
         Err(error) => {
-          if !self.server_exists() {
+          if !self.server_exists(fallback_server_path.as_str()) {
             Err(error)?;
           }
         }
       }
     }
 
-    self.did_find_server = true;
-    Ok(SERVER_PATH.to_string())
+    Ok(fallback_server_path.to_string())
   }
 }
 
 impl zed::Extension for BiomeExtension {
   fn new() -> Self {
-    Self {
-      did_find_server: false,
-    }
+    Self
   }
 
   fn language_server_command(
     &mut self,
     language_server_id: &LanguageServerId,
-    _worktree: &zed::Worktree,
+    worktree: &zed::Worktree,
   ) -> Result<zed::Command> {
-    let path = self.server_script_path(language_server_id)?;
+    let path = self.server_script_path(language_server_id, worktree)?;
 
     Ok(zed::Command {
       command: zed::node_binary_path()?,
