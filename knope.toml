@@ -3,6 +3,13 @@ changelog = "CHANGELOG.md"
 versioned_files = ["Cargo.toml"]
 
 [[workflows]]
+name = "document-change"
+
+
+[[workflows.steps]]
+type = "CreateChangeFile"
+
+[[workflows]]
 name = "release"
 
 [[workflows.steps]]

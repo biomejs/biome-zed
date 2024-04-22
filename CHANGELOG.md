@@ -1,5 +1,11 @@
 # Changelog 
 
+## 0.0.6 (2024-04-22)
+
+### Fixes
+
+- Fix broken release
+
 ## 0.0.5 (2024-04-22)
 
 ### Fixes
