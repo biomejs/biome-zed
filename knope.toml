@@ -27,11 +27,15 @@ type = "Command"
 command = "git commit -m \"chore: Bump to version\""
 variables = {"version" = "Version"}
 
-
 # Push the commit and the new tag to our remote repository.
 [[workflows.steps]]
 type = "Command"
 command = "git push"
+
+
+# Create a GitHub release for each package.
+[[workflows.steps]]
+type = "Release"
 
 [[workflows.steps]]
 type = "Command"
