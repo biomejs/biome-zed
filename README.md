@@ -28,6 +28,7 @@ Languages currently supported:
 - **Vue.js**
 - **Astro**
 - **Svelte**
+- **CSS**
 
 ## Installation
 
