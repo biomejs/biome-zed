@@ -33,6 +33,24 @@ just install-tools
 
 If you make changes to the Rust code and you require to reload the extension,  you can open the "Extensions" tab by running the command `zed: extensions`, choose the `"Installed"`, seek the current extension and click the `"Rebuild"` label.
 
+### Custom biome binary
+
+The binary used by the extension can be overriden in Zed settings.json using the `lsp` key:
+
+```jsonc
+// settings.json
+{
+  "lsp": {
+    "biome": {
+      "binary": {
+        "path": "<path_to_biome_binary>",
+        "arguments": ["lsp-proxy"]
+      }
+    }
+  } 
+}
+```
+
 #### Logs
 
 Zed will print logs in the following directory: `~/Library/Logs/Zed/Zed.log`
