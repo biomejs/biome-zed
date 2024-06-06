@@ -9,11 +9,12 @@ version        = "0.0.6"
 [language_servers.biome]
 code_actions_kind = ["", "quickfix"]
 language          = "JavaScript"
-languages         = ["JavaScript", "JSX", "TypeScript", "TSX", "Vue.js", "Astro", "Svelte", "JSON", "JSONC"]
+languages         = ["JavaScript", "JSX", "TypeScript", "TSX", "Vue.js", "Astro", "Svelte", "JSON", "JSONC", "CSS"]
 name              = "Biome Language Server"
 
 [language_servers.biome.language_ids]
 "Astro"      = "astro"
+"CSS"        = "css"
 "JSON"       = "json"
 "JSONC"      = "jsonc"
 "JSX"        = "javascriptreact"
