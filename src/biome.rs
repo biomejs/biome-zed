@@ -1,4 +1,5 @@
 use std::{env, fs, path::Path};
+use zed::settings::LspSettings;
 use zed_extension_api::{self as zed, serde_json, LanguageServerId, Result};
 
 const SERVER_PATH: &str = "node_modules/@biomejs/biome/bin/biome";
@@ -86,17 +87,28 @@ impl zed::Extension for BiomeExtension {
     worktree: &zed::Worktree,
   ) -> Result<zed::Command> {
     let path = self.server_script_path(language_server_id, worktree)?;
+    let settings = LspSettings::for_worktree(language_server_id.as_ref(), worktree)?;
+
+    let args = vec![
+      env::current_dir()
+        .unwrap()
+        .join(path)
+        .to_string_lossy()
+        .to_string(),
+      "lsp-proxy".to_string(),
+    ];
+
+    if let Some(binary) = settings.binary {
+      return Ok(zed::Command {
+        command: binary.path.map_or(zed::node_binary_path()?, |path| path),
+        args: binary.arguments.map_or(args, |args| args),
+        env: Default::default(),
+      });
+    }
 
     Ok(zed::Command {
       command: zed::node_binary_path()?,
-      args: vec![
-        env::current_dir()
-          .unwrap()
-          .join(path)
-          .to_string_lossy()
-          .to_string(),
-        "lsp-proxy".to_string(),
-      ],
+      args,
       env: Default::default(),
     })
   }
