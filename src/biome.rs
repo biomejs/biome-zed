@@ -89,7 +89,7 @@ impl zed::Extension for BiomeExtension {
     let path = self.server_script_path(language_server_id, worktree)?;
     let settings = LspSettings::for_worktree(language_server_id.as_ref(), worktree)?;
 
-    let args = vec![
+    let mut args = vec![
       env::current_dir()
         .unwrap()
         .join(path)
@@ -97,6 +97,18 @@ impl zed::Extension for BiomeExtension {
         .to_string(),
       "lsp-proxy".to_string(),
     ];
+
+    if let Some(settings) = settings.settings {
+      let config_path = settings
+        .get("config_path")
+        .clone()
+        .map(|value| value.as_str().unwrap());
+
+      if let Some(path) = config_path {
+        args.push("--config-path".to_string());
+        args.push(path.to_string());
+      }
+    }
 
     if let Some(binary) = settings.binary {
       return Ok(zed::Command {
