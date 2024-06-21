@@ -1,0 +1,47 @@
+name: Publish
+
+on:
+  workflow_dispatch:
+#    inputs:
+#      nightly:
+#        type: boolean
+#        default: true
+#        required: false
+#        description: 'Publish a nightly build'
+jobs:
+  publish-github-release:
+    name: Publish to GitHub Releases
+    needs: [ build ]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate release notes
+        id: release-notes
+        uses: orhun/git-cliff-action@v2
+        with:
+          config: cliff.toml
+          args: -vv --latest --strip header
+        env:
+          OUTPUT: CHANGES.md
+
+      - name: Strip tag from release notes
+        run: tail -n +3 < CHANGES.md > RELEASE_NOTES.md
+
+      - name: Rename artifact
+        run: mv "Biome-${{ needs.build.outputs.version }}.zip" biome.zip
+
+      - name: Publish extension to GitHub Releases
+        uses: softprops/action-gh-release@v1
+        with:
+          name: "v${{ needs.build.outputs.version }}"
+          body_path: RELEASE_NOTES.md
+          prerelease: ${{ needs.build.outputs.nightly == 'true' }}
+          draft: true
+          files: biome.zip
+          tag_name: ${{ needs.build.outputs.nightly == 'true' && github.ref || format('v{0}', needs.build.outputs.version) }}
