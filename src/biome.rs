@@ -101,7 +101,6 @@ impl zed::Extension for BiomeExtension {
     if let Some(settings) = settings.settings {
       let config_path = settings
         .get("config_path")
-        .clone()
         .map(|value| value.as_str().unwrap());
 
       if let Some(path) = config_path {
