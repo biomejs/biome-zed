@@ -99,9 +99,7 @@ impl zed::Extension for BiomeExtension {
     ];
 
     if let Some(settings) = settings.settings {
-      let config_path = settings
-        .get("config_path")
-        .map(|value| value.as_str().unwrap());
+      let config_path = settings.get("config_path").and_then(|value| value.as_str());
 
       if let Some(path) = config_path {
         args.push("--config-path".to_string());
