@@ -39,7 +39,7 @@ This extension is available in the extensions view inside the Zed editor. Open `
 
 Run code actions on format:
 
-```json5
+```jsonc
 // settings.json
 {
   "code_actions_on_format": {
@@ -51,7 +51,7 @@ Run code actions on format:
 
 Configure the `--config-path` flag for the language server:
 
-```json5
+```jsonc
 // settings.json
 {
   "lsp": {
