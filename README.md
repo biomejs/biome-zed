@@ -6,7 +6,6 @@
     </picture>
 </p>
 
-
 <div align="center">
 
 [![CI main](https://github.com/biomejs/biome-zed/actions/workflows/main.yml/badge.svg)](https://github.com/biomejs/biome-zed/actions/workflows/main.yml)
@@ -38,16 +37,29 @@ This extension is available in the extensions view inside the Zed editor. Open `
 
 ## Configuration
 
-Example configurations in zed `settings.json`.
+Run code actions on format:
 
-```json5
+```jsonc
 // settings.json
 {
-  "format_on_save": "on",
   "code_actions_on_format": {
-    "source.fixAll": true,
+    "source.fixAll.biome": true,
     "source.organizeImports.biome": true
-  },
-  "formatter": "language_server"
+  }
+}
+```
+
+Configure the `--config-path` flag for the language server:
+
+```jsonc
+// settings.json
+{
+  "lsp": {
+    "biome": {
+      "settings": {
+        "config_path": "<path>/biome.json"
+      }
+    }
+  }
 }
 ```
