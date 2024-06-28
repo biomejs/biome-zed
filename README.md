@@ -37,19 +37,9 @@ This extension is available in the extensions view inside the Zed editor. Open `
 
 ## Configuration
 
-Run code actions on format:
+By default, the biome.json file is required to be in the **root of the workspace**.
 
-```jsonc
-// settings.json
-{
-  "code_actions_on_format": {
-    "source.fixAll.biome": true,
-    "source.organizeImports.biome": true
-  }
-}
-```
-
-Configure the `--config-path` flag for the language server:
+Otherwise, it can be configured through the lsp settings:
 
 ```jsonc
 // settings.json
@@ -63,3 +53,58 @@ Configure the `--config-path` flag for the language server:
   }
 }
 ```
+
+### Formatting
+
+**Formatting does not work through the extension yet.**
+
+Instead, you can configure biome as an external formatter:
+
+```jsonc
+// settings.json
+{
+  "formatter": {
+    "external": {
+      "command": "./node_modules/@biomejs/biome/bin/biome",
+      "arguments": ["format", "--write", "--stdin-file-path", "{buffer_path}"]
+    }
+  }
+}
+```
+
+### Project based configuration
+
+If you'd like to exclude biome from running in every project,
+
+1. Disable the biome language server in user settings:
+
+```jsonc
+// settings.json
+{
+  "language_servers": [ "!biome", "..." ]
+}
+```
+
+2. And enable it in the projects local settings:
+
+```jsonc
+// <workspace>/.zed/settings.json
+{
+  "language_servers": [ "biome", "..." ]
+}
+```
+
+The same can be configured on a per-lanugage bassis with the [`languages`](https://zed.dev/docs/configuring-zed#languages) key.
+
+### Run code actions on format:
+
+```jsonc
+// settings.json
+{
+  "code_actions_on_format": {
+    "source.fixAll.biome": true,
+    "source.organizeImports.biome": true
+  }
+}
+```
+
