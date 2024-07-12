@@ -108,7 +108,7 @@ impl zed::Extension for BiomeExtension {
 
       let config_path = config_path_setting.unwrap_or("biome.json");
 
-      if require_config_file == true && worktree.read_text_file(config_path).ok().is_none() {
+      if require_config_file && worktree.read_text_file(config_path).ok().is_none() {
         return Err("biome.json is not found but require_config_file is true".to_string());
       }
 
