@@ -99,11 +99,22 @@ impl zed::Extension for BiomeExtension {
     ];
 
     if let Some(settings) = settings.settings {
-      let config_path = settings.get("config_path").and_then(|value| value.as_str());
+      let config_path_setting = settings.get("config_path").and_then(|value| value.as_str());
 
-      if let Some(path) = config_path {
+      let require_config_file = settings
+        .get("require_config_file")
+        .and_then(|value| value.as_bool())
+        .unwrap_or(false);
+
+      let config_path = config_path_setting.unwrap_or("biome.json");
+
+      if require_config_file == true && worktree.read_text_file(config_path).ok().is_none() {
+        return Err("biome.json is not found but require_config_file is true".to_string());
+      }
+
+      if config_path_setting.is_some() {
         args.push("--config-path".to_string());
-        args.push(path.to_string());
+        args.push(config_path.to_string());
       }
     }
 
