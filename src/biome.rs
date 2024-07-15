@@ -6,7 +6,7 @@ use zed_extension_api::{
   LanguageServerId, Result,
 };
 
-const SERVER_PATH: &str = "node_modules/@biomejs/biome/bin/biome";
+const SERVER_PATH: &str = "node_modules/@biomejs";
 const PACKAGE_NAME: &str = "@biomejs/biome";
 
 const BIOME_CONFIG_PATHS: &[&str] = &["biome.json", "biome.jsonc"];
@@ -35,10 +35,24 @@ impl BiomeExtension {
         || !f["devDependencies"]["@biomejs/biome"].is_null()
     });
 
+    let (platform, arch) = zed::current_platform();
+    let binary_path = format!(
+      "{SERVER_PATH}/cli-{platform}-{arch}/biome",
+      platform = match platform {
+        zed::Os::Mac => "darwin",
+        zed::Os::Linux => "linux",
+        zed::Os::Windows => "win32",
+      },
+      arch = match arch {
+        zed::Architecture::Aarch64 => "arm64",
+        zed::Architecture::X8664 | zed::Architecture::X86 => "x64",
+      },
+    );
+
     if server_package_exists {
       let worktree_root_path = worktree.root_path();
       let worktree_server_path = Path::new(worktree_root_path.as_str())
-        .join(SERVER_PATH)
+        .join(binary_path)
         .to_string_lossy()
         .to_string();
 
@@ -50,7 +64,7 @@ impl BiomeExtension {
       &zed::LanguageServerInstallationStatus::CheckingForUpdate,
     );
 
-    let fallback_server_path = SERVER_PATH.to_string();
+    let fallback_server_path = binary_path.to_string();
     let fallback_server_exist = self.server_exists(fallback_server_path.as_str());
     let version = zed::npm_package_latest_version(PACKAGE_NAME)?;
 
@@ -116,14 +130,7 @@ impl zed::Extension for BiomeExtension {
     let path = self.server_script_path(language_server_id, worktree)?;
     let settings = LspSettings::for_worktree(language_server_id.as_ref(), worktree)?;
 
-    let mut args = vec![
-      env::current_dir()
-        .unwrap()
-        .join(path)
-        .to_string_lossy()
-        .to_string(),
-      "lsp-proxy".to_string(),
-    ];
+    let mut args = vec!["lsp-proxy".to_string()];
 
     if let Some(settings) = settings.settings {
       let config_path = self.config_path(worktree, &settings);
@@ -141,16 +148,22 @@ impl zed::Extension for BiomeExtension {
       }
     }
 
+    let bin = env::current_dir()
+      .unwrap()
+      .join(path)
+      .to_string_lossy()
+      .to_string();
+
     if let Some(binary) = settings.binary {
       return Ok(zed::Command {
-        command: binary.path.map_or(zed::node_binary_path()?, |path| path),
+        command: binary.path.map_or(bin, |path| path),
         args: binary.arguments.map_or(args, |args| args),
         env: Default::default(),
       });
     }
 
     Ok(zed::Command {
-      command: zed::node_binary_path()?,
+      command: bin,
       args,
       env: Default::default(),
     })
