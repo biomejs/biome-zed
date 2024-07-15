@@ -1,9 +1,15 @@
 use std::{env, fs, path::Path};
 use zed::settings::LspSettings;
-use zed_extension_api::{self as zed, serde_json, LanguageServerId, Result};
+use zed_extension_api::{
+  self as zed,
+  serde_json::{self, Value},
+  LanguageServerId, Result,
+};
 
 const SERVER_PATH: &str = "node_modules/@biomejs/biome/bin/biome";
 const PACKAGE_NAME: &str = "@biomejs/biome";
+
+const BIOME_CONFIG_PATHS: &[&str] = &["biome.json", "biome.jsonc"];
 
 struct BiomeExtension;
 
@@ -74,6 +80,27 @@ impl BiomeExtension {
 
     Ok(fallback_server_path.to_string())
   }
+
+  // Returns the path if a config file exists
+  pub fn config_path(&self, worktree: &zed::Worktree, settings: &Value) -> Option<String> {
+    let config_path_setting = settings.get("config_path").and_then(|value| value.as_str());
+
+    if let Some(config_path) = config_path_setting {
+      if worktree.read_text_file(config_path).is_ok() {
+        return Some(config_path.to_string());
+      } else {
+        return None;
+      }
+    }
+
+    for config_path in BIOME_CONFIG_PATHS {
+      if worktree.read_text_file(config_path).is_ok() {
+        return Some(config_path.to_string());
+      }
+    }
+
+    None
+  }
 }
 
 impl zed::Extension for BiomeExtension {
@@ -99,22 +126,18 @@ impl zed::Extension for BiomeExtension {
     ];
 
     if let Some(settings) = settings.settings {
-      let config_path_setting = settings.get("config_path").and_then(|value| value.as_str());
+      let config_path = self.config_path(worktree, &settings);
 
       let require_config_file = settings
         .get("require_config_file")
         .and_then(|value| value.as_bool())
         .unwrap_or(false);
 
-      let config_path = config_path_setting.unwrap_or("biome.json");
-
-      if require_config_file && worktree.read_text_file(config_path).ok().is_none() {
-        return Err("biome.json is not found but require_config_file is true".to_string());
-      }
-
-      if config_path_setting.is_some() {
+      if let Some(config_path) = config_path {
         args.push("--config-path".to_string());
-        args.push(config_path.to_string());
+        args.push(config_path.clone());
+      } else if require_config_file {
+        return Err("biome.json is not found but require_config_file is true".to_string());
       }
     }
 
