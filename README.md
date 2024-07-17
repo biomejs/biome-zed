@@ -72,6 +72,21 @@ Instead, you can configure biome as an external formatter:
 }
 ```
 
+### Enable biome only when biome.json is present
+
+```jsonc
+// settings.json
+{
+  "lsp": {
+    "biome": {
+      "settings": {
+        "require_config_file": true
+      }
+    }
+  }
+}
+```
+
 ### Project based configuration
 
 If you'd like to exclude biome from running in every project,
@@ -107,4 +122,3 @@ The same can be configured on a per-lanugage bassis with the [`languages`](https
   }
 }
 ```
-
