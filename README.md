@@ -56,17 +56,14 @@ Otherwise, it can be configured through the lsp settings:
 
 ### Formatting
 
-**Formatting does not work through the extension yet.**
-
-Instead, you can configure biome as an external formatter:
+To use the language server as a formatter, specify biome as your formatter in the settings:
 
 ```jsonc
 // settings.json
 {
   "formatter": {
-    "external": {
-      "command": "./node_modules/@biomejs/biome/bin/biome",
-      "arguments": ["format", "--write", "--stdin-file-path", "{buffer_path}"]
+    "language_server": {
+      "name": "biome"
     }
   }
 }
