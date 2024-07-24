@@ -45,7 +45,8 @@ impl BiomeExtension {
       },
       arch = match arch {
         zed::Architecture::Aarch64 => "arm64",
-        zed::Architecture::X8664 | zed::Architecture::X86 => "x64",
+        zed::Architecture::X8664 => "x64",
+        _ => return Err(format!("unsupported architecture: {arch:?}")),
       },
     );
 
