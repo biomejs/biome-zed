@@ -46,7 +46,7 @@ impl BiomeExtension {
     if local_binary_path.exists() {
       Ok(local_binary_path)
     } else {
-      Err(format!("Error: biome binary not found"))
+      Err("Error: biome binary not found".to_string())
     }
   }
 
