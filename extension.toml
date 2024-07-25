@@ -4,7 +4,7 @@ id             = "biome"
 name           = "Biome"
 repository     = "https://github.com/biomejs/biome-zed"
 schema_version = 1
-version        = "0.1.0"
+version        = "0.1.1"
 
 [language_servers.biome]
 code_actions_kind = ["", "quickfix"]
