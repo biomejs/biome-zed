@@ -1,2 +1,6 @@
 target
 extension.wasm
+node_modules
+package-lock.json
+pnpm-lock.yaml
+package.json
