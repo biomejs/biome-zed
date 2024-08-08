@@ -97,7 +97,7 @@ If you'd like to exclude biome from running in every project,
 }
 ```
 
-2. And enable it in the projects local settings:
+2. And enable it in the project's local settings:
 
 ```jsonc
 // <workspace>/.zed/settings.json
@@ -106,7 +106,7 @@ If you'd like to exclude biome from running in every project,
 }
 ```
 
-The same can be configured on a per-lanugage bassis with the [`languages`](https://zed.dev/docs/configuring-zed#languages) key.
+The same can be configured on a per-language basis with the [`languages`](https://zed.dev/docs/configuring-zed#languages) key.
 
 ### Run code actions on format:
 
