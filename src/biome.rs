@@ -39,17 +39,6 @@ impl BiomeExtension {
     ))
   }
 
-  fn resolve_binary(&self, root_path: &str) -> Result<PathBuf> {
-    let specifier = self.binary_specifier()?;
-    let local_binary_path = Path::new(root_path).join("node_modules").join(specifier);
-
-    if local_binary_path.exists() {
-      Ok(local_binary_path)
-    } else {
-      Err("Error: biome binary not found".to_string())
-    }
-  }
-
   fn server_script_path(
     &mut self,
     language_server_id: &LanguageServerId,
@@ -83,8 +72,7 @@ impl BiomeExtension {
       &zed::LanguageServerInstallationStatus::CheckingForUpdate,
     );
 
-    let specifier = self.binary_specifier()?;
-    let fallback_server_path = &Path::new("./node_modules").join(specifier);
+    let fallback_server_path = &Path::new("./node_modules").join(self.binary_specifier()?);
     let version = zed::npm_package_latest_version(PACKAGE_NAME)?;
 
     if !self.server_exists(fallback_server_path)
