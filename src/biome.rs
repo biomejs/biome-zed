@@ -83,7 +83,8 @@ impl BiomeExtension {
       &zed::LanguageServerInstallationStatus::CheckingForUpdate,
     );
 
-    let fallback_server_path = &self.resolve_binary("./")?;
+    let specifier = self.binary_specifier()?;
+    let fallback_server_path = &Path::new("./node_modules").join(specifier);
     let version = zed::npm_package_latest_version(PACKAGE_NAME)?;
 
     if !self.server_exists(fallback_server_path)
@@ -104,7 +105,9 @@ impl BiomeExtension {
         }
         Err(error) => {
           if !self.server_exists(fallback_server_path) {
-            Err(error)?;
+            Err(format!(
+              "failed to install package '{PACKAGE_NAME}': {error}"
+            ))?;
           }
         }
       }
