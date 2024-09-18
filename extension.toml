@@ -4,17 +4,18 @@ id             = "biome"
 name           = "Biome"
 repository     = "https://github.com/biomejs/biome-zed"
 schema_version = 1
-version        = "0.1.2"
+version        = "0.1.3"
 
 [language_servers.biome]
-code_actions_kind = ["", "quickfix"]
+code_actions_kind = ["quickfix"]
 language          = "JavaScript"
-languages         = ["JavaScript", "JSX", "TypeScript", "TSX", "Vue.js", "Astro", "Svelte", "JSON", "JSONC", "CSS"]
+languages         = ["JavaScript", "JSX", "TypeScript", "TSX", "Vue.js", "Astro", "Svelte", "JSON", "JSONC", "CSS", "GraphQL"]
 name              = "Biome Language Server"
 
 [language_servers.biome.language_ids]
 "Astro"      = "astro"
 "CSS"        = "css"
+"GraphQL"    = "graphql"
 "JSON"       = "json"
 "JSONC"      = "jsonc"
 "JSX"        = "javascriptreact"
