@@ -21,11 +21,16 @@ impl BiomeExtension {
     fs::metadata(path).map_or(false, |stat| stat.is_file())
   }
 
-  fn binary_specifier(&self) -> Result<String> {
+  fn binary_specifier(&self) -> Result<String, String> {
     let (platform, arch) = zed::current_platform();
 
+    let binary_name = match platform {
+      zed::Os::Windows => "biome.exe",
+      _ => "biome",
+    };
+
     Ok(format!(
-      "@biomejs/cli-{platform}-{arch}/biome",
+      "@biomejs/cli-{platform}-{arch}/{binary}",
       platform = match platform {
         zed::Os::Mac => "darwin",
         zed::Os::Linux => "linux",
@@ -36,6 +41,7 @@ impl BiomeExtension {
         zed::Architecture::X8664 => "x64",
         _ => return Err(format!("unsupported architecture: {arch:?}")),
       },
+      binary = binary_name,
     ))
   }
 
