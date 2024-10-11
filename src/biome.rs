@@ -134,6 +134,7 @@ impl zed::Extension for BiomeExtension {
 
     let mut args = vec!["lsp-proxy".to_string()];
 
+    // evaluate lsp settings
     if let Some(settings) = settings.settings {
       let require_config_file = settings
         .get("require_config_file")
@@ -147,6 +148,7 @@ impl zed::Extension for BiomeExtension {
       }
     }
 
+    // check and run biome with custom binary
     if let Some(binary) = settings.binary {
       return Ok(zed::Command {
         command: binary
@@ -157,6 +159,7 @@ impl zed::Extension for BiomeExtension {
       });
     }
 
+    // try to run from worktree biome package
     if self.worktree_biome_exists(worktree) {
       let server_path = Path::new(worktree.root_path().as_str())
         .join(WORKTREE_SERVER_PATH)
@@ -173,6 +176,7 @@ impl zed::Extension for BiomeExtension {
       });
     }
 
+    // install/update and run biome for extension
     if let Err(err) = self.check_biome_updates(language_server_id) {
       return Err(err);
     }
