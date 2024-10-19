@@ -3,7 +3,7 @@ edition = "2021"
 license = "MIT"
 name    = "zed_biome"
 publish = false
-version = "0.1.3"
+version = "0.1.4"
 
 [lib]
 crate-type = ["cdylib"]
