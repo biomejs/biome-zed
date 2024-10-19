@@ -174,9 +174,7 @@ impl zed::Extension for BiomeExtension {
     }
 
     // install/update and run biome for extension
-    if let Err(err) = self.check_biome_updates(language_server_id) {
-      return Err(err);
-    }
+    self.check_biome_updates(language_server_id)?;
 
     let mut server_path = PathBuf::from("./node_modules");
     server_path.push(self.binary_specifier()?);
