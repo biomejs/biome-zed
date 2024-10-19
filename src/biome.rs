@@ -1,7 +1,4 @@
-use std::{
-  env,
-  path::{Path, PathBuf},
-};
+use std::path::{Path, PathBuf};
 use zed::settings::LspSettings;
 use zed_extension_api::{
   self as zed,
@@ -181,14 +178,11 @@ impl zed::Extension for BiomeExtension {
       return Err(err);
     }
 
-    let server_path = Path::new(env::current_dir().unwrap().as_os_str())
-      .join("./node_modules")
-      .join(self.binary_specifier()?)
-      .to_string_lossy()
-      .to_string();
+    let mut server_path = PathBuf::from("./node_modules");
+    server_path.push(self.binary_specifier()?);
 
     Ok(zed::Command {
-      command: server_path,
+      command: server_path.to_string_lossy().to_string(),
       args,
       env: Default::default(),
     })
