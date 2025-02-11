@@ -15,7 +15,7 @@ struct BiomeExtension;
 
 impl BiomeExtension {
   fn extension_server_exists(&self, path: &PathBuf) -> bool {
-    std::fs::metadata(path).map_or(false, |stat| stat.is_file())
+    std::fs::metadata(path).is_ok_and(|stat| stat.is_file())
   }
 
   fn binary_specifier(&self) -> Result<String, String> {
