@@ -205,12 +205,20 @@ impl zed::Extension for BiomeExtension {
     let lsp_settings = LspSettings::for_worktree(language_server_id.as_ref(), worktree)?;
 
     let Some(settings) = lsp_settings.settings else {
-      return Ok(None);
+      return Ok(Some(serde_json::json!({
+        "biome": {},
+      })));
     };
 
+    let config_path = self
+      .config_path(worktree, &settings)
+      .map(|p| Path::new(&worktree.root_path()).join(p));
+
     Ok(Some(serde_json::json!({
-      "requireConfiguration": self.require_config_file(&settings),
-      "configurationPath": self.config_path(worktree, &settings),
+      "biome": {
+        "requireConfiguration": self.require_config_file(&settings),
+        "configurationPath": config_path,
+      },
     })))
   }
 }
