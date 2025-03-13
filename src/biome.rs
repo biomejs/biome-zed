@@ -210,7 +210,7 @@ impl zed::Extension for BiomeExtension {
 
     Ok(Some(serde_json::json!({
       "require_configuration": self.require_config_file(&settings),
-      "configuration_path": self.config_path(&worktree, &settings),
+      "configuration_path": self.config_path(worktree, &settings),
     })))
   }
 }
