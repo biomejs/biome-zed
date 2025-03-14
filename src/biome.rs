@@ -123,11 +123,11 @@ impl BiomeExtension {
       .unwrap_or(false)
   }
 
-  fn is_biome_v2(&self) -> bool {
+  fn is_biome_v1(&self) -> bool {
     zed::npm_package_installed_version(PACKAGE_NAME)
       .ok()
       .flatten()
-      .is_none_or(|version| version.starts_with("2."))
+      .is_some_and(|version| version.starts_with("1."))
   }
 }
 
@@ -146,7 +146,7 @@ impl zed::Extension for BiomeExtension {
     let mut args = vec!["lsp-proxy".to_string()];
 
     // evaluate lsp settings for v1 compatibility
-    if !self.is_biome_v2() {
+    if self.is_biome_v1() {
       if let Some(settings) = settings.settings {
         if let Some(config_path) = self.config_path(worktree, &settings) {
           args.append(&mut vec!["--config-path".to_string(), config_path.clone()]);
