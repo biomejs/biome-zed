@@ -3,7 +3,7 @@ use zed::settings::LspSettings;
 use zed_extension_api::{
   self as zed,
   serde_json::{self, Value},
-  LanguageServerId, Result,
+  LanguageServerId, Result, Worktree,
 };
 
 const WORKTREE_SERVER_PATH: &str = "node_modules/@biomejs/biome/bin/biome";
@@ -115,6 +115,20 @@ impl BiomeExtension {
 
     None
   }
+
+  fn require_config_file(&self, settings: &Value) -> bool {
+    settings
+      .get("require_config_file")
+      .and_then(|value| value.as_bool())
+      .unwrap_or(false)
+  }
+
+  fn is_biome_v1(&self) -> bool {
+    zed::npm_package_installed_version(PACKAGE_NAME)
+      .ok()
+      .flatten()
+      .is_some_and(|version| version.starts_with("1."))
+  }
 }
 
 impl zed::Extension for BiomeExtension {
@@ -131,17 +145,14 @@ impl zed::Extension for BiomeExtension {
 
     let mut args = vec!["lsp-proxy".to_string()];
 
-    // evaluate lsp settings
-    if let Some(settings) = settings.settings {
-      let require_config_file = settings
-        .get("require_config_file")
-        .and_then(|value| value.as_bool())
-        .unwrap_or(false);
-
-      if let Some(config_path) = self.config_path(worktree, &settings) {
-        args.append(&mut vec!["--config-path".to_string(), config_path.clone()]);
-      } else if require_config_file {
-        return Err("biome.json is not found but require_config_file is true".to_string());
+    // evaluate lsp settings for v1 compatibility
+    if self.is_biome_v1() {
+      if let Some(settings) = settings.settings {
+        if let Some(config_path) = self.config_path(worktree, &settings) {
+          args.append(&mut vec!["--config-path".to_string(), config_path.clone()]);
+        } else if self.require_config_file(&settings) {
+          return Err("biome.json is not found but require_config_file is true".to_string());
+        }
       }
     }
 
@@ -184,6 +195,31 @@ impl zed::Extension for BiomeExtension {
       args,
       env: Default::default(),
     })
+  }
+
+  fn language_server_workspace_configuration(
+    &mut self,
+    language_server_id: &LanguageServerId,
+    worktree: &Worktree,
+  ) -> Result<Option<Value>> {
+    let lsp_settings = LspSettings::for_worktree(language_server_id.as_ref(), worktree)?;
+
+    let Some(settings) = lsp_settings.settings else {
+      return Ok(Some(serde_json::json!({
+        "biome": {},
+      })));
+    };
+
+    let config_path = self
+      .config_path(worktree, &settings)
+      .map(|p| Path::new(&worktree.root_path()).join(p));
+
+    Ok(Some(serde_json::json!({
+      "biome": {
+        "requireConfiguration": self.require_config_file(&settings),
+        "configurationPath": config_path,
+      },
+    })))
   }
 }
 
