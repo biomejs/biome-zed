@@ -15,7 +15,3 @@ fmt:
 # Lint files
 lint:
  cargo clippy --all-targets
-
-# Document change
-changeset:
- knope document-change
