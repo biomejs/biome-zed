@@ -29,6 +29,7 @@ Languages currently supported:
 - **Svelte**
 - **CSS**
 - **GraphQL**
+- **HTML**
 
 ## Installation
 
