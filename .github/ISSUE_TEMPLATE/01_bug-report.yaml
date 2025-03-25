@@ -2,6 +2,7 @@ name: 🐛 Bug report
 description: Report an issue with the Biome Zed extension
 title: "🐛 "
 labels: [ "needs triage" ]
+type: Bug
 body:
   - type: input
     attributes:
