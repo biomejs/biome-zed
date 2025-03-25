@@ -10,7 +10,7 @@ crate-type = ["cdylib"]
 path       = "src/biome.rs"
 
 [dependencies]
-log                = "0.4.21"
+log                = "0.4.27"
 tracing            = "0.1.40"
 tracing-subscriber = "0.3.18"
 zed_extension_api  = "0.1.0"
