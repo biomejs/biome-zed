@@ -10,7 +10,7 @@ permissions:
 jobs:
   reply-labeled:
     if: github.repository == 'biomejs/biome-zed'
-    runs-on: ubuntu-latest
+    runs-on: depot-ubuntu-24.04-arm-small
     steps:
       - name: Remove triaging label
         if: contains(github.event.issue.labels.*.name, 'bug confirmed') && contains(github.event.issue.labels.*.name, 'needs triage')
