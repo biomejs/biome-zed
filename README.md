@@ -37,6 +37,10 @@ Requires Zed >= **v0.131.0**.
 
 This extension is available in the extensions view inside the Zed editor. Open `zed: extensions` and search for _Biome_.
 
+> [!NOTE]
+> Since v0.2.0, this extension is only compatible with Biome v2.
+> To use with Biome v1.x, please use v0.1.5, the last release of v0.1.x.
+
 ## Documentation
 
 Head to the [official documentation](https://biomejs.dev/reference/zed) to learn how to set up the extension, and customize it. 
