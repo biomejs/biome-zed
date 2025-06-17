@@ -121,13 +121,6 @@ impl BiomeExtension {
       .and_then(|value| value.as_bool())
       .unwrap_or(false)
   }
-
-  fn is_biome_v1(&self) -> bool {
-    zed::npm_package_installed_version(PACKAGE_NAME)
-      .ok()
-      .flatten()
-      .is_some_and(|version| version.starts_with("1."))
-  }
 }
 
 impl zed::Extension for BiomeExtension {
@@ -143,17 +136,6 @@ impl zed::Extension for BiomeExtension {
     let settings = LspSettings::for_worktree(language_server_id.as_ref(), worktree)?;
 
     let mut args = vec!["lsp-proxy".to_string()];
-
-    // evaluate lsp settings for v1 compatibility
-    if self.is_biome_v1() {
-      if let Some(settings) = settings.settings {
-        if let Some(config_path) = self.config_path(worktree, &settings) {
-          args.append(&mut vec!["--config-path".to_string(), config_path.clone()]);
-        } else if self.require_config_file(&settings) {
-          return Err("biome.json is not found but require_config_file is true".to_string());
-        }
-      }
-    }
 
     // check and run biome with custom binary
     if let Some(binary) = settings.binary {
