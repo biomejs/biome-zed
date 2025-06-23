@@ -911,9 +911,9 @@ dependencies = [
 
 [[package]]
 name = "zed_extension_api"
-version = "0.5.0"
+version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "40ef88a8e5aeff67b0996b1795d56338f04c02de95f1f147577944aa37b801d6"
+checksum = "a3ee021e3a4c69d6ae90137fcf7537d1a8a5032dc9bf180c8fa6dd1a2f7c56d7"
 dependencies = [
  "serde",
  "serde_json",
