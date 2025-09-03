@@ -14,3 +14,10 @@ log                = "0.4.27"
 tracing            = "0.1.41"
 tracing-subscriber = "0.3.19"
 zed_extension_api  = "0.6.0"
+
+[profile.release]
+codegen-units = 1 # Allows LLVM to perform better optimization.
+lto = true # Enables link-time-optimizations.
+opt-level = "s" # Prioritizes small binary size. Use `3` if you prefer speed.
+strip = true # Ensures debug symbols are removed.
+
