@@ -148,14 +148,6 @@ impl zed::Extension for BiomeExtension {
       });
     }
 
-    if let Some(path) = worktree.which("biome") {
-      return Ok(zed::Command {
-        command: path,
-        args: args,
-        env: Default::default(),
-      });
-    }
-
     // try to run from worktree biome package
     if self.worktree_biome_exists(worktree) {
       let server_path = Path::new(worktree.root_path().as_str())
@@ -169,6 +161,14 @@ impl zed::Extension for BiomeExtension {
       return Ok(zed::Command {
         command: zed::node_binary_path()?,
         args: node_args,
+        env: Default::default(),
+      });
+    }
+
+    if let Some(path) = worktree.which("biome") {
+      return Ok(zed::Command {
+        command: path,
+        args: args,
         env: Default::default(),
       });
     }
