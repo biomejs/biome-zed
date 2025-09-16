@@ -1,8 +1,9 @@
 use std::path::{Path, PathBuf};
 use zed::settings::LspSettings;
 use zed_extension_api::{
-  self as zed, LanguageServerId, Result, Worktree,
+  self as zed,
   serde_json::{self, Value},
+  LanguageServerId, Result, Worktree,
 };
 
 const WORKTREE_SERVER_PATH: &str = "node_modules/@biomejs/biome/bin/biome";
@@ -140,10 +141,8 @@ impl zed::Extension for BiomeExtension {
     // check and run biome with custom binary
     if let Some(binary) = settings.binary {
       return Ok(zed::Command {
-        command: binary
-          .path
-          .map_or(WORKTREE_SERVER_PATH.to_string(), |path| path),
-        args: binary.arguments.map_or(args, |args| args),
+        command: binary.path.unwrap_or(WORKTREE_SERVER_PATH.to_string()),
+        args: binary.arguments.unwrap_or(args),
         env: Default::default(),
       });
     }
