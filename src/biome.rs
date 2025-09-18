@@ -1,9 +1,8 @@
 use std::path::{Path, PathBuf};
 use zed::settings::LspSettings;
 use zed_extension_api::{
-  self as zed,
+  self as zed, LanguageServerId, Result, Worktree,
   serde_json::{self, Value},
-  LanguageServerId, Result, Worktree,
 };
 
 const WORKTREE_SERVER_PATH: &str = "node_modules/@biomejs/biome/bin/biome";
