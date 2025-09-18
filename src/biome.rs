@@ -167,7 +167,7 @@ impl zed::Extension for BiomeExtension {
     if let Some(path) = worktree.which("biome") {
       return Ok(zed::Command {
         command: path,
-        args: args,
+        args,
         env: Default::default(),
       });
     }
