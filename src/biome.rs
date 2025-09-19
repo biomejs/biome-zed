@@ -140,10 +140,8 @@ impl zed::Extension for BiomeExtension {
     // check and run biome with custom binary
     if let Some(binary) = settings.binary {
       return Ok(zed::Command {
-        command: binary
-          .path
-          .map_or(WORKTREE_SERVER_PATH.to_string(), |path| path),
-        args: binary.arguments.map_or(args, |args| args),
+        command: binary.path.unwrap_or(WORKTREE_SERVER_PATH.to_string()),
+        args: binary.arguments.unwrap_or(args),
         env: Default::default(),
       });
     }
@@ -161,6 +159,14 @@ impl zed::Extension for BiomeExtension {
       return Ok(zed::Command {
         command: zed::node_binary_path()?,
         args: node_args,
+        env: Default::default(),
+      });
+    }
+
+    if let Some(path) = worktree.which("biome") {
+      return Ok(zed::Command {
+        command: path,
+        args,
         env: Default::default(),
       });
     }
