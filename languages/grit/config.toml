@@ -1,0 +1,3 @@
+name = "GritQL"
+grammar = "gritql"
+path_suffixes = ["grit"]
