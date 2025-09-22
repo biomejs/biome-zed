@@ -38,3 +38,7 @@ name = "Biome Language Server"
 "TSX"        = "typescriptreact"
 "TypeScript" = "typescript"
 "Vue.js"     = "vuejs"
+
+[grammars.gritql]
+repository = "https://github.com/honeycombio/tree-sitter-gritql"
+rev        = "9ffe44d15359476af27f07130807a5ac979e477f"
