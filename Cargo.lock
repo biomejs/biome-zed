@@ -945,7 +945,7 @@ dependencies = [
 
 [[package]]
 name = "zed_biome"
-version = "0.1.4"
+version = "0.2.2"
 dependencies = [
  "log",
  "tracing",
