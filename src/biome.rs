@@ -121,6 +121,13 @@ impl BiomeExtension {
       .and_then(|value| value.as_bool())
       .unwrap_or(false)
   }
+
+  fn inline_config(&self, settings: &Value) -> bool {
+    settings
+      .get("inline_config")
+      .and_then(|value| value.as_bool())
+      .unwrap_or(false)
+  }
 }
 
 impl zed::Extension for BiomeExtension {
@@ -205,6 +212,7 @@ impl zed::Extension for BiomeExtension {
       "biome": {
         "requireConfiguration": self.require_config_file(&settings),
         "configurationPath": config_path,
+        "inline_config": self.inline_config(&settings),
       },
     })))
   }
