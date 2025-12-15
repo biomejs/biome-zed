@@ -1,6 +1,5 @@
 use std::path::{Path, PathBuf};
 use zed::settings::LspSettings;
-use zed_extension_api::serde_json::Map;
 use zed_extension_api::{
   self as zed, LanguageServerId, Result, Worktree,
   serde_json::{self, Value},
@@ -122,12 +121,6 @@ impl BiomeExtension {
       .and_then(|value| value.as_bool())
       .unwrap_or(false)
   }
-
-  fn inline_config(&self, settings: &Value) -> Option<Map<String, Value>> {
-    settings
-      .get("inline_config")
-      .and_then(|value| value.as_object().cloned())
-  }
 }
 
 impl zed::Extension for BiomeExtension {
@@ -212,7 +205,6 @@ impl zed::Extension for BiomeExtension {
       "biome": {
         "requireConfiguration": self.require_config_file(&settings),
         "configurationPath": config_path,
-        "inlineConfig": self.inline_config(&settings),
       },
     })))
   }
