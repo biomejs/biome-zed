@@ -22,6 +22,7 @@ languages = [
   "CSS",
   "GraphQL",
   "HTML",
+  "SVG",
 ]
 name = "Biome Language Server"
 
@@ -30,6 +31,7 @@ name = "Biome Language Server"
 "CSS"        = "css"
 "GraphQL"    = "graphql"
 "HTML"       = "html"
+"SVG"        = "svg"
 "JSON"       = "json"
 "JSONC"      = "jsonc"
 "JSX"        = "javascriptreact"
