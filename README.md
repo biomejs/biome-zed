@@ -30,6 +30,7 @@ Languages currently supported:
 - **CSS**
 - **GraphQL**
 - **HTML**
+- **SVG**
 
 ## Installation
 

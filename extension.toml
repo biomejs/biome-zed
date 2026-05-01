@@ -4,10 +4,9 @@ id             = "biome"
 name           = "Biome"
 repository     = "https://github.com/biomejs/biome-zed"
 schema_version = 1
-version        = "0.3.0"
+version        = "0.3.1"
 
 [language_servers.biome]
-code_action_kinds = ["quickfix"]
 language = "JavaScript"
 languages = [
   "JavaScript",
@@ -22,6 +21,7 @@ languages = [
   "CSS",
   "GraphQL",
   "HTML",
+  "XML",
 ]
 name = "Biome Language Server"
 
@@ -38,6 +38,7 @@ name = "Biome Language Server"
 "TSX"        = "typescriptreact"
 "TypeScript" = "typescript"
 "Vue.js"     = "vuejs"
+"XML"        = "xml"
 
 [grammars.gritql]
 repository = "https://github.com/honeycombio/tree-sitter-gritql"
