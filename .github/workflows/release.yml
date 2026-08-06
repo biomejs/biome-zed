@@ -1,0 +1,22 @@
+name: Release Zed Extension
+
+on:
+  workflow_dispatch:
+    inputs:
+      forked_repo:
+        description: "The forked repository of the zed-industries/extensions repo e.g. mrm007/extensions"
+        required: true
+        type: string
+
+jobs:
+  release:
+    runs-on: depot-ubuntu-24.04-arm-16
+    steps:
+      - uses: huacnlee/zed-extension-action@v2
+        with:
+          extension-name: biome-zed
+          # extension-path: extensions/${{ extension-name }}
+          push-to: ${{ inputs.forked_repo }}
+        env:
+          # the personal access token should have "repo" & "workflow" scopes
+          COMMITTER_TOKEN: ${{ secrets.COMMITTER_TOKEN }}
