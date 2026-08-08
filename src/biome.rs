@@ -116,6 +116,58 @@ impl BiomeExtension {
     None
   }
 
+  // Mirrors biome's Configuration::is_root() logic:
+  //   - explicit "root": true  → root
+  //   - explicit "root": false → not root
+  //   - "extends": "//" implies "root": false (the "root" field may be omitted)
+  //   - no "root" field, no "extends": "//" → root (implicit default)
+  fn config_is_root(json: &Value) -> bool {
+    if let Some(root) = json.get("root").and_then(|v| v.as_bool()) {
+      return root;
+    }
+    let extends_root = json.get("extends").and_then(|v| v.as_str()) == Some("//");
+    !extends_root
+  }
+
+  // Returns the directory to use as configurationPath for the biome LSP.
+  // If the found config is not a root config, traverses parent directories to
+  // find the nearest ancestor config that is a root config.
+  fn find_root_config_dir(
+    &self,
+    worktree: &zed::Worktree,
+    config_relative_path: &str,
+  ) -> Option<PathBuf> {
+    let content = worktree.read_text_file(config_relative_path).ok()?;
+    let json: Value = serde_json::from_str(&content).ok()?;
+
+    if Self::config_is_root(&json) {
+      return Path::new(&worktree.root_path())
+        .join(config_relative_path)
+        .parent()
+        .map(|p| p.to_path_buf());
+    }
+
+    // Not a root config — traverse parent directories to find the root config
+    let mut current = Path::new(&worktree.root_path())
+      .parent()
+      .map(|p| p.to_path_buf());
+    while let Some(dir) = current {
+      for config_name in BIOME_CONFIG_PATHS {
+        let candidate = dir.join(config_name);
+        if let Ok(content) = std::fs::read_to_string(&candidate) {
+          if let Ok(json) = serde_json::from_str::<Value>(&content) {
+            if Self::config_is_root(&json) {
+              return Some(dir);
+            }
+          }
+        }
+      }
+      current = dir.parent().map(|p| p.to_path_buf());
+    }
+
+    None
+  }
+
   fn require_config_file(&self, settings: &Value) -> bool {
     settings
       .get("require_config_file")
@@ -206,7 +258,7 @@ impl zed::Extension for BiomeExtension {
 
     let config_path = self
       .config_path(worktree, &settings)
-      .map(|p| Path::new(&worktree.root_path()).join(p));
+      .and_then(|p| self.find_root_config_dir(worktree, &p));
 
     Ok(Some(serde_json::json!({
       "biome": {
