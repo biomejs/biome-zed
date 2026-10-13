@@ -19,17 +19,21 @@ This extension adds support for [Biome](https://github.com/biomejs/biome) in [Ze
 Languages currently supported:
 
 - **JavaScript**
+- **Google Apps Script**
 - **TypeScript**
 - **JSX**
 - **TSX**
 - **JSON**
 - **JSONC**
+- **YAML**
 - **Vue.js**
 - **Astro**
 - **Svelte**
 - **CSS**
+- **SCSS**
 - **GraphQL**
 - **HTML**
+- **Markdown**
 - **SVG**
 
 ## Installation
