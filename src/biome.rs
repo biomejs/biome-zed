@@ -7,39 +7,47 @@ use zed_extension_api::{
 };
 
 const WORKTREE_SERVER_PATH: &str = "node_modules/@biomejs/biome/bin/biome";
+const EXTENSION_NODE_MODULES_PATH: &str = "./node_modules";
 const PACKAGE_NAME: &str = "@biomejs/biome";
+const BIOME_CLI_PACKAGE_PREFIX: &str = "cli-";
 
 const BIOME_CONFIG_PATHS: &[&str] = &["biome.json", "biome.jsonc"];
 
 struct BiomeExtension;
 
-impl BiomeExtension {
-  fn extension_server_exists(&self, path: &PathBuf) -> bool {
-    std::fs::metadata(path).is_ok_and(|stat| stat.is_file())
+fn extension_server_path_from_node_modules(node_modules_path: &Path) -> Option<PathBuf> {
+  let biome_packages_path = node_modules_path.join("@biomejs");
+  let mut package_names = std::fs::read_dir(biome_packages_path)
+    .ok()?
+    .filter_map(|entry| entry.ok())
+    .filter_map(|entry| entry.file_name().into_string().ok())
+    .filter(|name| name.starts_with(BIOME_CLI_PACKAGE_PREFIX))
+    .collect::<Vec<_>>();
+
+  package_names.sort();
+
+  for package_name in package_names {
+    let binary_name = if package_name.starts_with("cli-win32-") {
+      "biome.exe"
+    } else {
+      "biome"
+    };
+    let path = node_modules_path
+      .join("@biomejs")
+      .join(package_name)
+      .join(binary_name);
+
+    if std::fs::metadata(&path).is_ok_and(|stat| stat.is_file()) {
+      return Some(path);
+    }
   }
 
-  fn binary_specifier(&self) -> Result<String, String> {
-    let (platform, arch) = zed::current_platform();
+  None
+}
 
-    let binary_name = match platform {
-      zed::Os::Windows => "biome.exe",
-      _ => "biome",
-    };
-
-    Ok(format!(
-      "@biomejs/cli-{platform}-{arch}/{binary}",
-      platform = match platform {
-        zed::Os::Mac => "darwin",
-        zed::Os::Linux => "linux",
-        zed::Os::Windows => "win32",
-      },
-      arch = match arch {
-        zed::Architecture::Aarch64 => "arm64",
-        zed::Architecture::X8664 => "x64",
-        _ => return Err(format!("unsupported architecture: {arch:?}")),
-      },
-      binary = binary_name,
-    ))
+impl BiomeExtension {
+  fn extension_server_path(&self) -> Option<PathBuf> {
+    extension_server_path_from_node_modules(Path::new(EXTENSION_NODE_MODULES_PATH))
   }
 
   fn worktree_biome_exists(&self, worktree: &zed::Worktree) -> bool {
@@ -63,10 +71,9 @@ impl BiomeExtension {
       &zed::LanguageServerInstallationStatus::CheckingForUpdate,
     );
 
-    let extension_server_path = &Path::new("./node_modules").join(self.binary_specifier()?);
     let version = zed::npm_package_latest_version(PACKAGE_NAME)?;
 
-    if !self.extension_server_exists(extension_server_path)
+    if self.extension_server_path().is_none()
       || zed::npm_package_installed_version(PACKAGE_NAME)?.as_ref() != Some(&version)
     {
       zed::set_language_server_installation_status(
@@ -76,14 +83,14 @@ impl BiomeExtension {
       let result = zed::npm_install_package(PACKAGE_NAME, &version);
       match result {
         Ok(()) => {
-          if !self.extension_server_exists(extension_server_path) {
+          if self.extension_server_path().is_none() {
             Err(format!(
-              "installed package '{PACKAGE_NAME}' did not contain expected path '{extension_server_path:?}'",
+              "installed package '{PACKAGE_NAME}' did not contain an executable @biomejs/cli-* package",
             ))?;
           }
         }
         Err(error) => {
-          if !self.extension_server_exists(extension_server_path) {
+          if self.extension_server_path().is_none() {
             Err(format!(
               "failed to install package '{PACKAGE_NAME}': {error}"
             ))?;
@@ -181,8 +188,9 @@ impl zed::Extension for BiomeExtension {
     // install/update and run biome for extension
     self.check_biome_updates(language_server_id)?;
 
-    let mut server_path = PathBuf::from("./node_modules");
-    server_path.push(self.binary_specifier()?);
+    let server_path = self.extension_server_path().ok_or_else(|| {
+      format!("package '{PACKAGE_NAME}' did not contain an executable @biomejs/cli-* package")
+    })?;
 
     Ok(zed::Command {
       command: server_path.to_string_lossy().to_string(),
@@ -219,3 +227,48 @@ impl zed::Extension for BiomeExtension {
 }
 
 zed::register_extension!(BiomeExtension);
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+  use std::fs;
+  use std::time::{SystemTime, UNIX_EPOCH};
+
+  fn temp_node_modules() -> PathBuf {
+    let unique = SystemTime::now()
+      .duration_since(UNIX_EPOCH)
+      .unwrap()
+      .as_nanos();
+    let path = std::env::temp_dir().join(format!("zed-biome-test-{unique}"));
+    fs::create_dir_all(path.join("@biomejs")).unwrap();
+    path
+  }
+
+  #[test]
+  fn finds_linux_cli_installed_by_npm() {
+    let node_modules = temp_node_modules();
+    let package_dir = node_modules.join("@biomejs").join("cli-linux-x64");
+    fs::create_dir_all(&package_dir).unwrap();
+    fs::write(package_dir.join("biome"), "").unwrap();
+
+    let path = extension_server_path_from_node_modules(&node_modules).unwrap();
+
+    assert_eq!(path, package_dir.join("biome"));
+
+    fs::remove_dir_all(node_modules).unwrap();
+  }
+
+  #[test]
+  fn finds_windows_cli_installed_by_npm() {
+    let node_modules = temp_node_modules();
+    let package_dir = node_modules.join("@biomejs").join("cli-win32-arm64");
+    fs::create_dir_all(&package_dir).unwrap();
+    fs::write(package_dir.join("biome.exe"), "").unwrap();
+
+    let path = extension_server_path_from_node_modules(&node_modules).unwrap();
+
+    assert_eq!(path, package_dir.join("biome.exe"));
+
+    fs::remove_dir_all(node_modules).unwrap();
+  }
+}
